@@ -7,6 +7,7 @@ export default function Main() {
     "tomatoes",
   ]);
 
+  //part of the old way of using an event listener for the form, need to have onSubmit={handleSubmit} in form
   function handleSubmit(event) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -19,6 +20,10 @@ export default function Main() {
     }
   }
 
+  /**
+   * Uses action property in form  to prevent default behavior, reset form, and pass FormData without having to be explicit
+   * @param {*} formData is passed in from the from using formData type and the name of the input
+   */
   function addIngredient(formData) {
     const newIngredient = formData.get("ingredient");
     if (!ingredients.includes(newIngredient) && !newIngredient == "") {
