@@ -39,6 +39,23 @@ export default function Main() {
     setIngredient(newList);
   }
 
+  //generate the ready for recipe section with the button
+  function generateRecipe() {
+    return (
+      <section className="generateButton">
+        <div>
+          <h3>Ready for recipe</h3>
+          <p>Generate a recipe from your list of ingredients.</p>
+        </div>
+        <button onClick={submitRecipe}>Get a recipe</button>
+      </section>
+    );
+  }
+
+  function submitRecipe() {
+    console.log(ingredients);
+  }
+
   return (
     <main>
       <form className="add-ingredient-form" action={addIngredient}>
@@ -52,15 +69,20 @@ export default function Main() {
         <button>Add ingredient</button>
       </form>
 
-      <div className="ingredient-list-container">
-        <ul className="ingredient-list">
-          {ingredients.map((item) => (
-            <li onClick={erase} key={ingredients.indexOf(item)}>
-              {item}
-            </li>
-          ))}
-        </ul>
-      </div>
+      <section>
+        {ingredients.length > 0 ? <h2>Ingredients on hand:</h2> : null}
+        <div className="ingredient-list-container">
+          <ul className="ingredient-list">
+            {ingredients.map((item) => (
+              <li onClick={erase} key={ingredients.indexOf(item)}>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      {ingredients.length > 4 ? generateRecipe() : null}
     </main>
   );
 }
