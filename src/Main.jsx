@@ -1,11 +1,31 @@
 import React from "react";
+import ClaudeRecipe from "./ClaudeRecipe";
+import IngredientsList from "./IngredientsList";
+
+//// THIS WAS THE DELETE FUNCTION
+/**
+      <section>
+        {ingredients.length > 0 ? <h2>Ingredients on hand:</h2> : null}
+        <div className="ingredient-list-container">
+          <ul className="ingredient-list">
+            {ingredients.map((item) => (
+              <li onClick={erase} key={ingredients.indexOf(item)}>
+                {item}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>*/
 
 export default function Main() {
   const [ingredients, setIngredient] = React.useState([
     "chicken",
     "oregano",
     "tomatoes",
+    "spices",
+    "salt",
   ]);
+  const [recipeShown, setRecipeShown] = React.useState(false);
 
   //part of the old way of using an event listener for the form, need to have onSubmit={handleSubmit} in form
   function handleSubmit(event) {
@@ -34,8 +54,7 @@ export default function Main() {
 
   function erase(key) {
     //filters by text inside the clicked list item, removes it from the state ingredients list and force render
-    console.log(key.target.innerHTML);
-    const newList = ingredients.filter((x) => x !== key.target.innerHTML);
+    const newList = ingredients.filter((x) => x !== ingredients[key]);
     setIngredient(newList);
   }
 
@@ -52,10 +71,12 @@ export default function Main() {
     );
   }
 
+  //API CALL for recipe information
   function submitRecipe() {
-    console.log(ingredients);
+    setRecipeShown((prev) => !prev);
   }
 
+  //MAIN PAGE HERE
   return (
     <main>
       <form className="add-ingredient-form" action={addIngredient}>
@@ -69,20 +90,11 @@ export default function Main() {
         <button>Add ingredient</button>
       </form>
 
-      <section>
-        {ingredients.length > 0 ? <h2>Ingredients on hand:</h2> : null}
-        <div className="ingredient-list-container">
-          <ul className="ingredient-list">
-            {ingredients.map((item) => (
-              <li onClick={erase} key={ingredients.indexOf(item)}>
-                {item}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
+      <IngredientsList erase={erase} ingredients={ingredients} />
 
       {ingredients.length > 4 ? generateRecipe() : null}
+
+      {recipeShown && <ClaudeRecipe />}
     </main>
   );
 }
