@@ -26,6 +26,8 @@ export default function Main() {
     "salt",
   ]);
   const [recipeShown, setRecipeShown] = React.useState(false);
+  const [response, setResponse] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState(false);
 
   //part of the old way of using an event listener for the form, need to have onSubmit={handleSubmit} in form
   function handleSubmit(event) {
@@ -54,6 +56,7 @@ export default function Main() {
 
   function erase(key) {
     //filters by text inside the clicked list item, removes it from the state ingredients list and force render
+    setResponse("");
     const newList = ingredients.filter((x) => x !== ingredients[key]);
     setIngredient(newList);
   }
@@ -66,14 +69,47 @@ export default function Main() {
           <h3>Ready for recipe</h3>
           <p>Generate a recipe from your list of ingredients.</p>
         </div>
-        <button onClick={submitRecipe}>Get a recipe</button>
+        <button disabled={isLoading} id="recipeButton" onClick={submitRecipe}>
+          {isLoading ? "Loading" : "Get a Recipe"}
+        </button>
       </section>
     );
   }
 
   //API CALL for recipe information
-  function submitRecipe() {
-    setRecipeShown((prev) => !prev);
+  async function submitRecipe() {
+    console.log("pressed");
+    const listedIngredients = ingredients.join(",");
+    setIsLoading((prev) => !prev);
+
+    await fetch("http://localhost:11434/api/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gemma3",
+        prompt:
+          " I have a list of ingredients, please give me a recipe. Here is the list: " +
+          listedIngredients,
+        stream: false,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        setResponse(data.response);
+        setIsLoading((prev) => !prev);
+        console.log("before " + recipeShown);
+        setRecipeShown((prev) => !prev);
+        console.log("after " + recipeShown);
+      })
+      .catch((err) => {
+        console.log("Error:", err);
+        setIsLoading((prev) => !prev);
+        setResponse("Error found, something happened you suck");
+        setRecipeShown((prev) => !prev);
+      });
   }
 
   //MAIN PAGE HERE
@@ -94,7 +130,9 @@ export default function Main() {
 
       {ingredients.length > 4 ? generateRecipe() : null}
 
-      {recipeShown && <ClaudeRecipe />}
+      {recipeShown && ingredients.length > 4 && (
+        <ClaudeRecipe response={response} />
+      )}
     </main>
   );
 }
